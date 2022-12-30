@@ -23,6 +23,7 @@ USE IEEE.STD_LOGIC_1164.ALL;
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
 USE IEEE.NUMERIC_STD.ALL;
+USE STD.ENV.FINISH;
 
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx leaf cells in this code.
@@ -76,7 +77,8 @@ BEGIN
         sum <= '1';
         WAIT FOR 10ns;
         sum <= '0';
-        WAIT
+        WAIT FOR 10ns;
+        FINISH;
 
     END PROCESS;
 END Behavioral;
