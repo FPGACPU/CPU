@@ -3,7 +3,7 @@
 <!--                                                         -->
 <!-- Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="61" Path="C:/Users/horri/OneDrive/Escritorio/Documentos/Vivado/CPU/CPU.xpr">
+<Project Version="7" Minor="61" Path="C:/Users/alvar/OneDrive/Escritorio/FPGA/Repositorio/CPU/CPU.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="93b73d5bfdc54efda2c33dfe55ddf13a"/>
@@ -91,6 +91,13 @@
       <Filter Type="Srcs"/>
       <File Path="$PSRCDIR/sources_1/new/alu.vhd">
         <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/new/sequencer.vhd">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
