@@ -1,3 +1,4 @@
+LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.NUMERIC_STD.ALL;
 USE STD.ENV.FINISH;
@@ -7,20 +8,24 @@ END alu_tb;
 
 ARCHITECTURE Behavioral OF alu_tb IS
     COMPONENT alu
+        GENERIC (
+            N : INTEGER := 9
+        );
         PORT (
-            data1 : IN unsigned(0 TO 8);
-            data2 : IN unsigned(0 TO 8);
+            data1 : IN unsigned(0 TO (N - 1));
+            data2 : IN unsigned(0 TO (N - 1));
             pac, tra2, dec, sum : IN STD_LOGIC;
-            result : OUT unsigned(0 TO 8);
+            result : OUT unsigned(0 TO (N - 1));
             z : OUT STD_LOGIC);
 
     END COMPONENT;
 
-    SIGNAL data1 : unsigned(0 TO 8) := "000001010";
-    SIGNAL data2 : unsigned(0 TO 8) := "000000101";
+    CONSTANT bits : INTEGER := 9;
+    SIGNAL data1 : unsigned(0 TO (bits - 1)) := to_unsigned(10, bits);
+    SIGNAL data2 : unsigned(0 TO (bits - 1)) := to_unsigned(5, bits);
     SIGNAL pac, tra2, dec : STD_LOGIC := '0';
     SIGNAL sum : STD_LOGIC := '0';
-    SIGNAL result : unsigned(0 TO 8);
+    SIGNAL result : unsigned(0 TO (bits - 1));
     SIGNAL z : STD_LOGIC;
 BEGIN
 
