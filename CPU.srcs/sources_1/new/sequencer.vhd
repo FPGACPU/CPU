@@ -20,16 +20,19 @@ END sequencer;
 
 ARCHITECTURE Behavioral OF sequencer IS
 
-    SIGNAL I0, I1, O0, O1 : STD_LOGIC;
+    SIGNAL STATE : STD_LOGIC_VECTOR (1 DOWNTO 0);
+
+    -- 00 == I0             10 == O0 
+    -- 01 == I1             11 == O1
 
 BEGIN
     --Simplez orders
     -- It is set as a ciclic process
 
-    sequencer : PROCESS (CLK, lec, esc, pac, tra2, dec, sum, eac, sac, scp, ecp, incp, ccp, era, sri, eri, z, CO)
+    sequencer : PROCESS (CLK, z, CO)
     BEGIN
         --stage I0 
-        IF (falling_edge(CLK) AND I1 = '0' AND O0 = '0' AND 01 = '0') THEN
+        IF (falling_edge(CLK) AND STATE = "00") THEN
 
             IF (CO = "000") THEN --ST
                 era <= '0';
@@ -40,8 +43,6 @@ BEGIN
             ELSIF (CO = "010") THEN --ADD
                 era <= '0';
                 scp <= '0';
-            ELSE
-                UNAFFECTED;
 
             END IF;
 
@@ -49,11 +50,11 @@ BEGIN
             incp <= '1';
             lec <= '1';
 
-            I1 <= '1';
+            STATE <= "01";
         END IF;
 
         --stage I1
-        IF (falling_edge(CLK) AND I1 = '1') THEN
+        IF (falling_edge(CLK) AND STATE = "01") THEN
             eri <= '0';
             incp <= '0';
             lec <= '0';
@@ -87,18 +88,15 @@ BEGIN
                 ccp <= '1';
                 era <= '1';
                 scp <= '1';
-            ELSE
-                UNAFFECTED;
 
             END IF;
 
-            I1 <= '0';
-            O0 <= '1';
+            STATE <= "10";
 
         END IF;
 
         --stage O0
-        IF (falling_edge(CLK) AND O0 = '1') THEN
+        IF (falling_edge(CLK) AND STATE = "10") THEN
 
             IF (CO = "000") THEN --ST
                 era <= '0';
@@ -123,7 +121,7 @@ BEGIN
                 ecp <= '0';
                 era <= '0';
                 sri <= '0';
-            ELSIF (CO = "100" AND z = '1') THEN--BZ
+            ELSIF (CO = "100") THEN--BZ
                 era <= '0';
                 scp <= '0';
             ELSIF (CO = "101") THEN--CLR
@@ -138,17 +136,14 @@ BEGIN
                 ccp <= '0';
                 era <= '0';
                 scp <= '0';
-            ELSE
-                UNAFFECTED;
 
             END IF;
 
-            O0 <= '0';
-            O1 <= '1';
+            STATE <= "11";
 
         END IF;
         --stage O1
-        IF (falling_edge(CLK) AND O0 = '1') THEN
+        IF (falling_edge(CLK) AND STATE = "11") THEN
 
             IF (CO = "000") THEN --ST
                 esc <= '0';
@@ -169,12 +164,10 @@ BEGIN
 
                 era <= '1';
                 scp <= '1';
-            ELSE
-                UNAFFECTED;
 
             END IF;
 
-            O1 <= '0';
+            STATE <= "00";
 
         END IF;
 
