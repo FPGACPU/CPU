@@ -7,6 +7,7 @@ USE IEEE.NUMERIC_STD.ALL;
 ENTITY sequencer IS
     PORT (
         z : IN STD_LOGIC;
+        CLK : IN STD_LOGIC;
         CO : IN STD_LOGIC_VECTOR (2 DOWNTO 0); --instruction operation code 
         lec, esc : OUT STD_LOGIC; -- MP's u-orders 
         pac, tra2, dec, sum : OUT STD_LOGIC; --ALU's u-orders
@@ -14,91 +15,168 @@ ENTITY sequencer IS
         scp, ecp, incp, ccp : OUT STD_LOGIC; --CP's u-orders
         era : OUT STD_LOGIC; --RA's u-orders
         sri, eri : OUT STD_LOGIC --RI's u-orders
-        --CLK : IN STD_LOGIC 
-        -- idk if we should add the clk signal. I think so, but I cant find the sinc registers and idk how Juan did it (in order to have the same in both files)
-
     );
 END sequencer;
 
 ARCHITECTURE Behavioral OF sequencer IS
 
-    SIGNAL I0 : STD_LOGIC_VECTOR(2 DOWNTO 0);
-
-    SIGNAL ST_I1 : STD_LOGIC_VECTOR(2 DOWNTO 0);
-    SIGNAL LD_I1 : STD_LOGIC_VECTOR(1 DOWNTO 0);
-    SIGNAL ADD_I1 : STD_LOGIC_VECTOR(1 DOWNTO 0);
-    SIGNAL BR_I1 : STD_LOGIC_VECTOR(2 DOWNTO 0);
-    SIGNAL BZ_I1 : STD_LOGIC_VECTOR(1 DOWNTO 0);
-    SIGNAL CLR_I1 : STD_LOGIC_VECTOR(2 DOWNTO 0);
-    SIGNAL DEC_I1 : STD_LOGIC_VECTOR(2 DOWNTO 0);
-    SIGNAL HALT_I1 : STD_LOGIC_VECTOR(2 DOWNTO 0);
-
-    SIGNAL ST_O0 : STD_LOGIC_VECTOR(1 DOWNTO 0);
-    SIGNAL LD_O0 : STD_LOGIC_VECTOR(2 DOWNTO 0);
-    SIGNAL ADD_O0 : STD_LOGIC_VECTOR(2 DOWNTO 0);
-
-    SIGNAL O1 : STD_LOGIC_VECTOR(1 DOWNTO 0);
+    SIGNAL I0, I1, O0, O1 : STD_LOGIC;
 
 BEGIN
     --Simplez orders
-    -------------------------------------------------------change
-    --Stage I0
-    I0 <= eri & incp & lec;
+    -- It is set as a ciclic process
 
-    --Stage I1    
-    ST_I1 <= sac & era & sri;
-    LD_I1 <= era & sri;
-    ADD_I1 <= era & sri;
-    BR_I1 <= ecp & era & sri;
-    BZ_I1 <= era & scp;
-    CLR_I1 <= eac & era & lec;
-    DEC_I1 <= eac & era & dec;
-    HALT_I1 <= ccp & era & scp;
-
-    --stage O0
-    ST_O0 <= sac & esc;
-    LD_O0 <= eac & tra2 & lec;
-    ADD_O0 <= eac & sum & lec;
-
-    --stage O1
-
-    O1 <= era & scp;
-
-    -----------------------------------------------
-
-    sequencer : PROCESS (ST_I1, LD_I1, ADD_I1, BR_I1, BZ_I1, CLR_I1, DEC_I1, HALT_I1, ST_O0, LD_I1, ADD_I1, z, CO)
+    sequencer : PROCESS (CLK, lec, esc, pac, tra2, dec, sum, eac, sac, scp, ecp, incp, ccp, era, sri, eri, z, CO)
     BEGIN
-        --stage I0
-        I0 <= "111";
-        --stage I1
-        ----------------------------------------------change
-        BZ_I1 <= "11" WHEN (CO = "100" & z = '1');
+        --stage I0 
+        IF (falling_edge(CLK) AND I1 = '0' AND O0 = '0' AND 01 = '0') THEN
 
-        CASE(CO) IS
-            WHEN "000" => ST_I1 <= "111";
-            WHEN "001" => LD_I1 <= "11";
-            WHEN "010" => ADD_I1 <= "11";
-            WHEN "011" => BR_I1 <= "111";
-            WHEN "101" => CLR_I1 <= "111";
-            WHEN "110" => DEC_I1 <= "111";
-            WHEN "111" => HALT_I1 <= "111";
-            WHEN OTHERS => HALT_I1 <= "111";
-        END CASE;
+            IF (CO = "000") THEN --ST
+                era <= '0';
+                scp <= '0';
+            ELSIF (CO = "001") THEN--LD
+                era <= '0';
+                scp <= '0';
+            ELSIF (CO = "010") THEN --ADD
+                era <= '0';
+                scp <= '0';
+            ELSE
+                UNAFFECTED;
+
+            END IF;
+
+            eri <= '1';
+            incp <= '1';
+            lec <= '1';
+
+            I1 <= '1';
+        END IF;
+
+        --stage I1
+        IF (falling_edge(CLK) AND I1 = '1') THEN
+            eri <= '0';
+            incp <= '0';
+            lec <= '0';
+
+            IF (CO = "000") THEN --ST
+                sac <= '1';
+                era <= '1';
+                sri <= '1';
+            ELSIF (CO = "001") THEN--LD
+                era <= '1';
+                sri <= '1';
+            ELSIF (CO = "010") THEN --ADD
+                era <= '1';
+                sri <= '1';
+            ELSIF (CO = "011") THEN--BR
+                ecp <= '1';
+                era <= '1';
+                sri <= '1';
+            ELSIF (CO = "100" AND z = '1') THEN--BZ
+                era <= '1';
+                scp <= '1';
+            ELSIF (CO = "101") THEN--CLR
+                eac <= '1';
+                era <= '1';
+                lec <= '1';
+            ELSIF (CO = "110") THEN--DEC
+                eac <= '1';
+                era <= '1';
+                dec <= '1';
+            ELSIF (CO = "111") THEN--HALT
+                ccp <= '1';
+                era <= '1';
+                scp <= '1';
+            ELSE
+                UNAFFECTED;
+
+            END IF;
+
+            I1 <= '0';
+            O0 <= '1';
+
+        END IF;
 
         --stage O0
-        --------------------------------------------------add extra null case (when others)
-        CASE(CO) IS
-            WHEN "000" => ST_O0 <= "11";
-            WHEN "001" => LD_O0 <= "111";
-            WHEN "010" => ADD_O0 <= "111";
-            WHEN OTHERS =>
-        END CASE;
+        IF (falling_edge(CLK) AND O0 = '1') THEN
 
+            IF (CO = "000") THEN --ST
+                era <= '0';
+                sri <= '0';
+
+                esc <= '1';
+            ELSIF (CO = "001") THEN--LD
+                era <= '0';
+                sri <= '0';
+
+                eac <= '1';
+                tra2 <= '1';
+                lec <= '1';
+            ELSIF (CO = "010") THEN --ADD
+                era <= '0';
+                sri <= '0';
+
+                eac <= '1';
+                sum <= '1';
+                lec <= '1';
+            ELSIF (CO = "011") THEN--BR
+                ecp <= '0';
+                era <= '0';
+                sri <= '0';
+            ELSIF (CO = "100" AND z = '1') THEN--BZ
+                era <= '0';
+                scp <= '0';
+            ELSIF (CO = "101") THEN--CLR
+                eac <= '0';
+                era <= '0';
+                lec <= '0';
+            ELSIF (CO = "110") THEN--DEC
+                eac <= '0';
+                era <= '0';
+                dec <= '0';
+            ELSIF (CO = "111") THEN--HALT
+                ccp <= '0';
+                era <= '0';
+                scp <= '0';
+            ELSE
+                UNAFFECTED;
+
+            END IF;
+
+            O0 <= '0';
+            O1 <= '1';
+
+        END IF;
         --stage O1
-        ----------------------------------------------change
-        WITH CO SELECT
-            O1 <= "11" WHEN "000" | "001" | "010",
-            WHEN OTHERS;
+        IF (falling_edge(CLK) AND O0 = '1') THEN
+
+            IF (CO = "000") THEN --ST
+                esc <= '0';
+
+                era <= '1';
+                scp <= '1';
+            ELSIF (CO = "001") THEN--LD
+                eac <= '0';
+                tra2 <= '0';
+                lec <= '0';
+
+                era <= '1';
+                scp <= '1';
+            ELSIF (CO = "010") THEN --ADD
+                eac <= '0';
+                sum <= '0';
+                lec <= '0';
+
+                era <= '1';
+                scp <= '1';
+            ELSE
+                UNAFFECTED;
+
+            END IF;
+
+            O1 <= '0';
+
+        END IF;
 
     END PROCESS;
 END Behavioral;
