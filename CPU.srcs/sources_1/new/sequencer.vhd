@@ -33,19 +33,21 @@ BEGIN
     BEGIN
         --stage I0 
         IF (falling_edge(CLK) AND STATE = "00") THEN
+            -- All the outputs should be initialized and restarted    
+            esc <= '0';
+            pac <= '0';
+            tra2 <= '0';
+            dec <= '0';
+            sum <= '0';
+            eac <= '0';
+            sac <= '0';
+            scp <= '0';
+            ecp <= '0';
+            ccp <= '0';
+            era <= '0';
+            sri <= '0';
 
-            IF (CO = "000") THEN --ST
-                era <= '0';
-                scp <= '0';
-            ELSIF (CO = "001") THEN--LD
-                era <= '0';
-                scp <= '0';
-            ELSIF (CO = "010") THEN --ADD
-                era <= '0';
-                scp <= '0';
-
-            END IF;
-
+            -- I0 activations 
             eri <= '1';
             incp <= '1';
             lec <= '1';
@@ -59,37 +61,48 @@ BEGIN
             incp <= '0';
             lec <= '0';
 
-            IF (CO = "000") THEN --ST
-                sac <= '1';
-                era <= '1';
-                sri <= '1';
-            ELSIF (CO = "001") THEN--LD
-                era <= '1';
-                sri <= '1';
-            ELSIF (CO = "010") THEN --ADD
-                era <= '1';
-                sri <= '1';
-            ELSIF (CO = "011") THEN--BR
-                ecp <= '1';
-                era <= '1';
-                sri <= '1';
-            ELSIF (CO = "100" AND z = '1') THEN--BZ
-                era <= '1';
-                scp <= '1';
-            ELSIF (CO = "101") THEN--CLR
-                eac <= '1';
-                era <= '1';
-                lec <= '1';
-            ELSIF (CO = "110") THEN--DEC
-                eac <= '1';
-                era <= '1';
-                dec <= '1';
-            ELSIF (CO = "111") THEN--HALT
-                ccp <= '1';
-                era <= '1';
-                scp <= '1';
+            CASE (CO) IS
 
-            END IF;
+                WHEN "000" => --ST
+                    sac <= '1';
+                    era <= '1';
+                    sri <= '1';
+
+                WHEN "001" => --LD 
+                    era <= '1';
+                    sri <= '1';
+
+                WHEN "010" => --ADD 
+                    era <= '1';
+                    sri <= '1';
+
+                WHEN "011" => --BR
+                    ecp <= '1';
+                    era <= '1';
+                    sri <= '1';
+
+                WHEN "100" => --BZ
+                    IF (z = '1') THEN
+                        era <= '1';
+                        scp <= '1';
+                    END IF;
+
+                WHEN "101" => -- CLR 
+                    eac <= '1';
+                    era <= '1';
+                    lec <= '1';
+
+                WHEN "110" => --DEC
+                    eac <= '1';
+                    era <= '1';
+                    dec <= '1';
+
+                WHEN "111" => --HALT
+                    ccp <= '1';
+                    era <= '1';
+                    scp <= '1';
+
+            END CASE;
 
             STATE <= "10";
 
@@ -98,74 +111,84 @@ BEGIN
         --stage O0
         IF (falling_edge(CLK) AND STATE = "10") THEN
 
-            IF (CO = "000") THEN --ST
-                era <= '0';
-                sri <= '0';
+            CASE (CO) IS
 
-                esc <= '1';
-            ELSIF (CO = "001") THEN--LD
-                era <= '0';
-                sri <= '0';
+                WHEN "000" => --ST
+                    era <= '0';
+                    sri <= '0';
 
-                eac <= '1';
-                tra2 <= '1';
-                lec <= '1';
-            ELSIF (CO = "010") THEN --ADD
-                era <= '0';
-                sri <= '0';
+                    esc <= '1';
 
-                eac <= '1';
-                sum <= '1';
-                lec <= '1';
-            ELSIF (CO = "011") THEN--BR
-                ecp <= '0';
-                era <= '0';
-                sri <= '0';
-            ELSIF (CO = "100") THEN--BZ
-                era <= '0';
-                scp <= '0';
-            ELSIF (CO = "101") THEN--CLR
-                eac <= '0';
-                era <= '0';
-                lec <= '0';
-            ELSIF (CO = "110") THEN--DEC
-                eac <= '0';
-                era <= '0';
-                dec <= '0';
-            ELSIF (CO = "111") THEN--HALT
-                ccp <= '0';
-                era <= '0';
-                scp <= '0';
+                WHEN "001" => --LD 
+                    era <= '0';
+                    sri <= '0';
 
-            END IF;
+                    eac <= '1';
+                    tra2 <= '1';
+                    lec <= '1';
+
+                WHEN "010" => --ADD 
+                    era <= '0';
+                    sri <= '0';
+
+                    eac <= '1';
+                    sum <= '1';
+                    lec <= '1';
+
+                WHEN "011" => --BR
+                    ecp <= '0';
+                    era <= '0';
+                    sri <= '0';
+
+                WHEN "100" => --BZ
+                    era <= '0';
+                    scp <= '0';
+
+                WHEN "101" => -- CLR 
+                    eac <= '0';
+                    era <= '0';
+                    lec <= '0';
+
+                WHEN "110" => --DEC
+                    eac <= '0';
+                    era <= '0';
+                    dec <= '0';
+                WHEN "111" => --HALT
+                    ccp <= '0';
+                    era <= '0';
+                    scp <= '0';
+            END CASE;
 
             STATE <= "11";
 
         END IF;
         --stage O1
         IF (falling_edge(CLK) AND STATE = "11") THEN
+            CASE (CO) IS
 
-            IF (CO = "000") THEN --ST
-                esc <= '0';
+                WHEN "000" => --ST
+                    esc <= '0';
 
-                era <= '1';
-                scp <= '1';
-            ELSIF (CO = "001") THEN--LD
-                eac <= '0';
-                tra2 <= '0';
-                lec <= '0';
+                    era <= '1';
+                    scp <= '1';
 
-                era <= '1';
-                scp <= '1';
-            ELSIF (CO = "010") THEN --ADD
-                eac <= '0';
-                sum <= '0';
-                lec <= '0';
+                WHEN "001" => --LD 
+                    eac <= '0';
+                    tra2 <= '0';
+                    lec <= '0';
 
-                era <= '1';
-                scp <= '1';
+                    era <= '1';
+                    scp <= '1';
 
-            END IF;
+                WHEN "010" => --ADD 
+                    eac <= '0';
+                    sum <= '0';
+                    lec <= '0';
+
+                    era <= '1';
+                    scp <= '1';
+
+            END CASE;
 
             STATE <= "00";
 
