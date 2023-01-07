@@ -30,7 +30,6 @@ ARCHITECTURE Behavioral OF incregister IS
 
     SIGNAL suc_output : UNSIGNED(0 TO (N - 1));
     SIGNAL reg_data : UNSIGNED(0 TO (N - 1));
-    SIGNAL sel : STD_LOGIC_VECTOR (0 TO 1);
     SIGNAL reg_ld : STD_LOGIC;
 BEGIN
     reg : syncregister
@@ -43,10 +42,12 @@ BEGIN
         data => reg_data,
         output => output);
     suc_output <= output + 1;
+    
 
-    load_data : PROCESS (ld, inc, data, suc_output)
+    load_data : PROCESS (clk, ld, inc, data, suc_output)
+        VARIABLE sel : STD_LOGIC_VECTOR (0 TO 1);
     BEGIN
-        sel <= (ld & inc);
+        sel := ld & inc;
         CASE (sel) IS
             WHEN "10" => reg_data <= data;
             WHEN "01" => reg_data <= suc_output;

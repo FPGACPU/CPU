@@ -64,6 +64,8 @@ BEGIN
         ld <= '1';
         clr <= '0';
         WAIT FOR 10ns;
+        ld <= '0';
+        WAIT FOR 10ns;
         FINISH;
     END PROCESS;
 
