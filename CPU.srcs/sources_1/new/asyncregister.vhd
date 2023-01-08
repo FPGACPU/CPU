@@ -20,10 +20,8 @@ BEGIN
     BEGIN
         IF CLR = '1' THEN
             output_reg(0 TO (N - 1)) <= (OTHERS => '0');
-        ELSE
-            IF (ld = '1') THEN
-                output_reg <= data;
-            END IF;
+        ELSIF (ld = '1') THEN
+            output_reg <= data;
         END IF;
     END PROCESS;
 
