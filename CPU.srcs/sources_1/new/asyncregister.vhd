@@ -18,7 +18,7 @@ BEGIN
 
     sync : PROCESS (ld, clr, data)
     BEGIN
-        IF CLR = '1' THEN
+        IF clr = '1' THEN
             output_reg(0 TO (N - 1)) <= (OTHERS => '0');
         ELSIF (ld = '1') THEN
             output_reg <= data;
