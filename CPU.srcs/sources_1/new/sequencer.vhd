@@ -6,8 +6,8 @@ USE IEEE.NUMERIC_STD.ALL;
 
 ENTITY sequencer IS
     PORT (
-        z : IN STD_LOGIC;
-        CLK : IN STD_LOGIC;
+        Z : IN STD_LOGIC;
+        clk : IN STD_LOGIC;
         CO : IN STD_LOGIC_VECTOR (2 DOWNTO 0); --instruction operation code 
         lec, esc : OUT STD_LOGIC; -- MP's u-orders 
         pac, tra2, dec, sum : OUT STD_LOGIC; --ALU's u-orders
@@ -20,179 +20,132 @@ END sequencer;
 
 ARCHITECTURE Behavioral OF sequencer IS
 
-    SIGNAL STATE : STD_LOGIC_VECTOR (1 DOWNTO 0);
-
-    -- 00 == I0             10 == O0 
-    -- 01 == I1             11 == O1
+    TYPE state_type IS (I0, I1, O0, O1);
+    SIGNAL state : state_type;
+    SIGNAL new_state : state_type;
 
 BEGIN
     --Simplez orders
     -- It is set as a ciclic process
+    StateProcess : PROCESS (clk) --Registro de estado  
+    BEGIN
+        IF (falling_edge(clk)) THEN
+            state <= new_state;
+        END IF;
+    END PROCESS;
 
-    sequencer : PROCESS (CLK, z, CO)
+    sequencer : PROCESS (Z, CO, state)
     BEGIN
         --stage I0 
-        IF (falling_edge(CLK) AND STATE = "00") THEN
-            -- All the outputs should be initialized and restarted    
-            esc <= '0';
-            pac <= '0';
-            tra2 <= '0';
-            dec <= '0';
-            sum <= '0';
-            eac <= '0';
-            sac <= '0';
-            scp <= '0';
-            ecp <= '0';
-            ccp <= '0';
-            era <= '0';
-            sri <= '0';
 
-            -- I0 activations 
-            eri <= '1';
-            incp <= '1';
-            lec <= '1';
+        -- All the outputs should be initialized and restarted    
+        esc <= '0';
+        lec <= '0';
+        pac <= '0';
+        tra2 <= '0';
+        dec <= '0';
+        sum <= '0';
+        eri <= '0';
+        eac <= '0';
+        sac <= '0';
+        scp <= '0';
+        ecp <= '0';
+        incp <= '0';
+        ccp <= '0';
+        era <= '0';
+        sri <= '0';
+        CASE (state) IS
+            WHEN I0 => new_state <= I1;
+                lec <= '1';
+                incp <= '1';
+                eri <= '1';
+            WHEN I1 => CASE (CO) IS
 
-            STATE <= "01";
-        END IF;
+            WHEN "000" => --ST
+                sac <= '1';
+                era <= '1';
+                sri <= '1';
+                new_state <= O0;
 
-        --stage I1
-        IF (falling_edge(CLK) AND STATE = "01") THEN
-            eri <= '0';
-            incp <= '0';
-            lec <= '0';
+            WHEN "001" => --LD 
+                era <= '1';
+                sri <= '1';
+                new_state <= O0;
 
-            CASE (CO) IS
+            WHEN "010" => --ADD 
+                era <= '1';
+                sri <= '1';
+                new_state <= O0;
 
-                WHEN "000" => --ST
-                    sac <= '1';
-                    era <= '1';
-                    sri <= '1';
+            WHEN "011" => --BR
+                ecp <= '1';
+                era <= '1';
+                sri <= '1';
+                new_state <= I0;
 
-                WHEN "001" => --LD 
-                    era <= '1';
-                    sri <= '1';
-
-                WHEN "010" => --ADD 
-                    era <= '1';
-                    sri <= '1';
-
-                WHEN "011" => --BR
+            WHEN "100" => --BZ
+                IF (Z = '1') THEN
                     ecp <= '1';
-                    era <= '1';
                     sri <= '1';
-
-                WHEN "100" => --BZ
-                    IF (z = '1') THEN
-                        era <= '1';
-                        scp <= '1';
-                    END IF;
-
-                WHEN "101" => -- CLR 
-                    eac <= '1';
                     era <= '1';
-                    lec <= '1';
-
-                WHEN "110" => --DEC
-                    eac <= '1';
-                    era <= '1';
-                    dec <= '1';
-
-                WHEN "111" => --HALT
-                    ccp <= '1';
-                    era <= '1';
+                ELSE
                     scp <= '1';
+                    era <= '1';
+                END IF;
+                new_state <= I0;
 
-            END CASE;
+            WHEN "101" => -- CLR 
+                eac <= '1';
+                era <= '1';
+                pac <= '1';
+                scp <= '1';
+                new_state <= I0;
 
-            STATE <= "10";
+            WHEN "110" => --DEC
+                eac <= '1';
+                era <= '1';
+                dec <= '1';
+                scp <= '1';
+                new_state <= I0;
 
+            WHEN "111" => --HALT
+                ccp <= '1';
+                era <= '1';
+                scp <= '1';
+                new_state <= I1;
+
+            WHEN OTHERS => new_state <= I1;
+
+        END CASE;
+
+        WHEN O0 => new_state <= O1;
+        CASE (CO) IS
+
+            WHEN "000" => --ST
+                esc <= '1';
+                sac <= '1';
+
+            WHEN "001" => --LD 
+                eac <= '1';
+                tra2 <= '1';
+                lec <= '1';
+
+            WHEN "010" => --ADD 
+                eac <= '1';
+                sum <= '1';
+                lec <= '1';
+
+            WHEN OTHERS =>
+                new_state <= O1;
+
+        END CASE;
+        WHEN O1 => new_state <= I0;
+        era <= '1';
+        scp <= '1';
+        IF (CO = "000") THEN
+            sac <= '1';
         END IF;
-
-        --stage O0
-        IF (falling_edge(CLK) AND STATE = "10") THEN
-
-            CASE (CO) IS
-
-                WHEN "000" => --ST
-                    era <= '0';
-                    sri <= '0';
-
-                    esc <= '1';
-
-                WHEN "001" => --LD 
-                    era <= '0';
-                    sri <= '0';
-
-                    eac <= '1';
-                    tra2 <= '1';
-                    lec <= '1';
-
-                WHEN "010" => --ADD 
-                    era <= '0';
-                    sri <= '0';
-
-                    eac <= '1';
-                    sum <= '1';
-                    lec <= '1';
-
-                WHEN "011" => --BR
-                    ecp <= '0';
-                    era <= '0';
-                    sri <= '0';
-
-                WHEN "100" => --BZ
-                    era <= '0';
-                    scp <= '0';
-
-                WHEN "101" => -- CLR 
-                    eac <= '0';
-                    era <= '0';
-                    lec <= '0';
-
-                WHEN "110" => --DEC
-                    eac <= '0';
-                    era <= '0';
-                    dec <= '0';
-                WHEN "111" => --HALT
-                    ccp <= '0';
-                    era <= '0';
-                    scp <= '0';
-            END CASE;
-
-            STATE <= "11";
-
-        END IF;
-        --stage O1
-        IF (falling_edge(CLK) AND STATE = "11") THEN
-            CASE (CO) IS
-
-                WHEN "000" => --ST
-                    esc <= '0';
-
-                    era <= '1';
-                    scp <= '1';
-
-                WHEN "001" => --LD 
-                    eac <= '0';
-                    tra2 <= '0';
-                    lec <= '0';
-
-                    era <= '1';
-                    scp <= '1';
-
-                WHEN "010" => --ADD 
-                    eac <= '0';
-                    sum <= '0';
-                    lec <= '0';
-
-                    era <= '1';
-                    scp <= '1';
-
-            END CASE;
-
-            STATE <= "00";
-
-        END IF;
-
-    END PROCESS;
+        WHEN OTHERS => new_state <= O1;
+    END CASE;
+END PROCESS;
 END Behavioral;
