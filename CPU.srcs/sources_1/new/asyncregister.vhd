@@ -16,7 +16,7 @@ ARCHITECTURE Behavioral OF asyncregister IS
     SIGNAL output_reg : UNSIGNED(0 TO (N - 1));
 BEGIN
 
-    sync : PROCESS (ld, clr, data)
+    async : PROCESS (ld, clr, data)
     BEGIN
         IF clr = '1' THEN
             output_reg(0 TO (N - 1)) <= (OTHERS => '0');
