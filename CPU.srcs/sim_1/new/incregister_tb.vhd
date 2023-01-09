@@ -26,7 +26,7 @@ ARCHITECTURE Behavioral OF incregister_tb IS
     SIGNAL ld : STD_LOGIC := '0';
     SIGNAL clr : STD_LOGIC := '0';
     SIGNAL inc : STD_LOGIC := '0';
-    SIGNAL data : UNSIGNED(0 TO (bits - 1)) := "000000001000";
+    SIGNAL data : UNSIGNED(0 TO (bits - 1)) := to_unsigned(8, bits);
     SIGNAL output : UNSIGNED(0 TO (bits - 1));
 BEGIN
     DUT : incregister

@@ -21,7 +21,7 @@ BEGIN
 
     sync : PROCESS (clk, ld, clr, data)
     BEGIN
-        IF CLR = '1' THEN
+        IF clr = '1' THEN
             output_reg(0 TO (N - 1)) <= (OTHERS => '0');
         ELSIF (falling_edge(clk) AND ld = '1') THEN
             output_reg <= data;
