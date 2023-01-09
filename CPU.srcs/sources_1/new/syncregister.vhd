@@ -23,10 +23,8 @@ BEGIN
     BEGIN
         IF CLR = '1' THEN
             output_reg(0 TO (N - 1)) <= (OTHERS => '0');
-            ELSE
-            IF (falling_edge(clk) AND ld = '1') THEN
-                output_reg <= data;
-            END IF;
+        ELSIF (falling_edge(clk) AND ld = '1') THEN
+            output_reg <= data;
         END IF;
     END PROCESS;
 

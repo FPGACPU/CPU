@@ -23,8 +23,8 @@ ARCHITECTURE Behavioral OF syncregister_tb IS
     SIGNAL clk : STD_LOGIC := '0';
     SIGNAL ld : STD_LOGIC := '0';
     SIGNAL clr : STD_LOGIC := '0';
-    SIGNAL data : UNSIGNED(0 TO (N - 1)) := "000000001000";
-    SIGNAL output : UNSIGNED(0 TO (N - 1));
+    SIGNAL data : UNSIGNED(0 TO (bits - 1)) := to_unsigned(8,bits);
+    SIGNAL output : UNSIGNED(0 TO (bits - 1));
 BEGIN
     DUT : syncregister
 
