@@ -56,7 +56,7 @@ BEGIN
         ld <= '0';
         WAIT FOR 20ns;
         inc <= '1';
-        WAIT FOR 10ns;
+        WAIT FOR 40ns;
         inc <= '0';
         WAIT FOR 20ns;
         clr <= '1';

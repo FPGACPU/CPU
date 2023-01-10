@@ -42,9 +42,7 @@ BEGIN
         data => reg_data,
         output => output);
     suc_output <= output + 1;
-    
-
-    load_data : PROCESS (clk, ld, inc, data, suc_output)
+    load_data : PROCESS (ld, inc, data, suc_output)
         VARIABLE sel : STD_LOGIC_VECTOR (0 TO 1);
     BEGIN
         sel := ld & inc;
