@@ -8,8 +8,8 @@ END clk_module_tb;
 
 ARCHITECTURE Behavioral OF clk_module_tb IS
 
-    COMPONENT clk_divider IS
-        GENERIC (Divider : INTEGER := 4); --Divider 2^(N-1)
+    COMPONENT clk_module IS
+        GENERIC (Division : INTEGER := 4); -- Division 2^(N - 1)
         PORT (
             clk_in : IN STD_LOGIC;
             trace : IN STD_LOGIC; --Synchronous activation
@@ -22,7 +22,7 @@ ARCHITECTURE Behavioral OF clk_module_tb IS
     CONSTANT clk_period : TIME := 10ns;
 
 BEGIN
-    DUT : clk_divider
+    DUT : clk_module
     PORT MAP(
         clk_in => clk_in,
         trace => trace,
