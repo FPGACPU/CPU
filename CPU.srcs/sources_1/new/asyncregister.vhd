@@ -2,8 +2,7 @@ LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.NUMERIC_STD.ALL;
 ENTITY asyncregister IS
-    GENERIC (
-        N : INTEGER := 12);
+    GENERIC (N : INTEGER := 12);
     PORT (
         ld : IN STD_LOGIC;
         clr : IN STD_LOGIC;
@@ -12,8 +11,8 @@ ENTITY asyncregister IS
 END asyncregister;
 
 ARCHITECTURE Behavioral OF asyncregister IS
-
     SIGNAL output_reg : UNSIGNED(0 TO (N - 1));
+
 BEGIN
 
     async : PROCESS (ld, clr, data)

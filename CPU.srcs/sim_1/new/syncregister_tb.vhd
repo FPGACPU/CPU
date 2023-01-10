@@ -8,8 +8,7 @@ END syncregister_tb;
 
 ARCHITECTURE Behavioral OF syncregister_tb IS
     COMPONENT syncregister
-        GENERIC (
-            N : INTEGER := 12);
+        GENERIC (N : INTEGER := 12);
         PORT (
             clk : IN STD_LOGIC;
             ld : IN STD_LOGIC;
@@ -25,11 +24,10 @@ ARCHITECTURE Behavioral OF syncregister_tb IS
     SIGNAL clr : STD_LOGIC := '0';
     SIGNAL data : UNSIGNED(0 TO (bits - 1)) := to_unsigned(8, bits);
     SIGNAL output : UNSIGNED(0 TO (bits - 1));
+
 BEGIN
     DUT : syncregister
-
-    GENERIC MAP(
-        N => bits)
+    GENERIC MAP(N => bits)
     PORT MAP(
         clk => clk,
         ld => ld,

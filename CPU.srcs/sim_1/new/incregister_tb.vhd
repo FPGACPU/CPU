@@ -7,10 +7,8 @@ ENTITY incregister_tb IS
 END incregister_tb;
 
 ARCHITECTURE Behavioral OF incregister_tb IS
-
     COMPONENT incregister
-        GENERIC (
-            N : INTEGER := 12);
+        GENERIC (N : INTEGER := 12);
         PORT (
             clk : IN STD_LOGIC;
             ld : IN STD_LOGIC;
@@ -28,11 +26,10 @@ ARCHITECTURE Behavioral OF incregister_tb IS
     SIGNAL inc : STD_LOGIC := '0';
     SIGNAL data : UNSIGNED(0 TO (bits - 1)) := to_unsigned(8, bits);
     SIGNAL output : UNSIGNED(0 TO (bits - 1));
+
 BEGIN
     DUT : incregister
-
-    GENERIC MAP(
-        N => bits)
+    GENERIC MAP(N => bits)
     PORT MAP(
         clk => clk,
         ld => ld,

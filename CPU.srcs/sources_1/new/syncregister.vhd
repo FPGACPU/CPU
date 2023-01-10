@@ -4,8 +4,7 @@ LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.NUMERIC_STD.ALL;
 ENTITY syncregister IS
-    GENERIC (
-        N : INTEGER := 12);
+    GENERIC (N : INTEGER := 12);
     PORT (
         clk : IN STD_LOGIC;
         ld : IN STD_LOGIC;
@@ -15,10 +14,9 @@ ENTITY syncregister IS
 END syncregister;
 
 ARCHITECTURE Behavioral OF syncregister IS
-
     SIGNAL output_reg : UNSIGNED(0 TO (N - 1));
-BEGIN
 
+BEGIN
     sync : PROCESS (clk, ld, clr, data)
     BEGIN
         IF clr = '1' THEN

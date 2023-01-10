@@ -8,8 +8,7 @@ END asyncregister_tb;
 
 ARCHITECTURE Behavioral OF asyncregister_tb IS
     COMPONENT asyncregister
-        GENERIC (
-            N : INTEGER := 12);
+        GENERIC (N : INTEGER := 12);
         PORT (
             ld : IN STD_LOGIC;
             clr : IN STD_LOGIC;
@@ -22,11 +21,10 @@ ARCHITECTURE Behavioral OF asyncregister_tb IS
     SIGNAL clr : STD_LOGIC := '0';
     SIGNAL data : UNSIGNED(0 TO (bits - 1)) := to_unsigned(8, bits);
     SIGNAL output : UNSIGNED(0 TO (bits - 1));
+
 BEGIN
     DUT : asyncregister
-
-    GENERIC MAP(
-        N => bits)
+    GENERIC MAP(N => bits)
     PORT MAP(
         ld => ld,
         clr => clr,
