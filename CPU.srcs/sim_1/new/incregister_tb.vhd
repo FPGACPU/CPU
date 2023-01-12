@@ -31,7 +31,7 @@ BEGIN
     DUT : incregister
     GENERIC MAP(N => bits)
     PORT MAP(
-        clk => clk,
+        clk => NOT clk,
         ld => ld,
         clr => clr,
         inc => inc,
