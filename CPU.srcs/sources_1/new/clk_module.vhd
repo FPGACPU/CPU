@@ -20,7 +20,7 @@ BEGIN
     sync : PROCESS (clk_in)
         VARIABLE trace_start : BOOLEAN;
     BEGIN
-        IF (trace = '1' AND (count = to_unsigned(0, Division))) THEN
+        IF (trace = '1' AND (count(0) = '0')) THEN
             trace_start := True;
         ELSE
             trace_start := False;
