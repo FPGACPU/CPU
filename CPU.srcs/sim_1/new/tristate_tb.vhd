@@ -18,15 +18,15 @@ ARCHITECTURE Behavioral OF tristate_tb IS
     END COMPONENT;
 
     CONSTANT bits : INTEGER := 12;
-    SUBTYPE data_type IS STD_LOGIC_VECTOR(0 TO (bits - 1));
+    SUBTYPE datatype IS STD_LOGIC_VECTOR(0 TO (bits - 1));
     SIGNAL ex : STD_LOGIC := '0';
-    SIGNAL data : data_type := STD_LOGIC_VECTOR(to_unsigned(9, bits));
-    SIGNAL output : data_type;
+    SIGNAL data : datatype := STD_LOGIC_VECTOR(to_unsigned(9, bits));
+    SIGNAL output : datatype;
 
 BEGIN
     DUT : tristate
     GENERIC MAP(
-        T => data_type,
+        T => datatype,
         default_value => (OTHERS => 'Z'))
     PORT MAP(
         ex => ex,

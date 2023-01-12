@@ -16,6 +16,6 @@ END tristate;
 ARCHITECTURE Behavioral OF tristate IS
 
 BEGIN
-    output <= data WHEN ex = '0' ELSE
+    output <= data WHEN ex = '1' ELSE
         default_value;
 END Behavioral;
