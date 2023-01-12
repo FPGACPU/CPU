@@ -1,5 +1,3 @@
-
-
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.NUMERIC_STD.ALL;
@@ -9,13 +7,12 @@ ENTITY syncregister IS
         clk : IN STD_LOGIC;
         ld : IN STD_LOGIC;
         clr : IN STD_LOGIC;
-        data : IN UNSIGNED(0 TO (N - 1));
-        output : OUT UNSIGNED(0 TO (N - 1)));
+        data : IN STD_LOGIC_VECTOR(0 TO (N - 1));
+        output : OUT STD_LOGIC_VECTOR(0 TO (N - 1)));
 END syncregister;
 
 ARCHITECTURE Behavioral OF syncregister IS
-    SIGNAL output_reg : UNSIGNED(0 TO (N - 1));
-
+    SIGNAL output_reg : STD_LOGIC_VECTOR(0 TO (N - 1));
 BEGIN
     sync : PROCESS (clk, ld, clr, data)
     BEGIN
@@ -27,5 +24,4 @@ BEGIN
     END PROCESS;
 
     output <= output_reg;
-
 END Behavioral;

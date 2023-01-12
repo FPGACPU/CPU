@@ -13,8 +13,8 @@ ARCHITECTURE Behavioral OF syncregister_tb IS
             clk : IN STD_LOGIC;
             ld : IN STD_LOGIC;
             clr : IN STD_LOGIC;
-            data : IN UNSIGNED(0 TO (N - 1));
-            output : OUT UNSIGNED(0 TO (N - 1)));
+            data : IN STD_LOGIC_VECTOR(0 TO (N - 1));
+            output : OUT STD_LOGIC_VECTOR(0 TO (N - 1)));
     END COMPONENT;
 
     CONSTANT clk_period : TIME := 10 ns;
@@ -22,8 +22,8 @@ ARCHITECTURE Behavioral OF syncregister_tb IS
     SIGNAL clk : STD_LOGIC := '0';
     SIGNAL ld : STD_LOGIC := '0';
     SIGNAL clr : STD_LOGIC := '0';
-    SIGNAL data : UNSIGNED(0 TO (bits - 1)) := to_unsigned(8, bits);
-    SIGNAL output : UNSIGNED(0 TO (bits - 1));
+    SIGNAL data : STD_LOGIC_VECTOR(0 TO (bits - 1)) := STD_LOGIC_VECTOR(to_unsigned(8, bits));
+    SIGNAL output : STD_LOGIC_VECTOR(0 TO (bits - 1));
 
 BEGIN
     DUT : syncregister
