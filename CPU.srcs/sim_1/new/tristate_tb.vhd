@@ -8,21 +8,26 @@ END tristate_tb;
 
 ARCHITECTURE Behavioral OF tristate_tb IS
     COMPONENT tristate
-        GENERIC (N : INTEGER := 12);
+        GENERIC (
+            TYPE T;
+            default_value : T);
         PORT (
             ex : IN STD_LOGIC;
-            data : IN STD_LOGIC_VECTOR(0 TO (N - 1));
-            output : OUT STD_LOGIC_VECTOR(0 TO (N - 1)));
+            data : IN T;
+            output : OUT T);
     END COMPONENT;
 
     CONSTANT bits : INTEGER := 12;
+    SUBTYPE data_type IS STD_LOGIC_VECTOR(0 TO (bits - 1));
     SIGNAL ex : STD_LOGIC := '0';
-    SIGNAL data : STD_LOGIC_VECTOR(0 TO (bits - 1)) := STD_LOGIC_VECTOR(to_unsigned(9, bits));
-    SIGNAL output : STD_LOGIC_VECTOR(0 TO (bits - 1));
+    SIGNAL data : data_type := STD_LOGIC_VECTOR(to_unsigned(9, bits));
+    SIGNAL output : data_type;
 
 BEGIN
     DUT : tristate
-    GENERIC MAP(N => bits)
+    GENERIC MAP(
+        T => data_type,
+        default_value => (OTHERS => 'Z'))
     PORT MAP(
         ex => ex,
         data => data,
