@@ -34,7 +34,6 @@ BEGIN
     simregister : PROCESS
     BEGIN
         ld <= '1';
-
         WAIT FOR 30ns;
         ld <= '0';
         data <= (OTHERS => 'Z');

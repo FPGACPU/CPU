@@ -12,14 +12,13 @@ END asyncregister;
 
 ARCHITECTURE Behavioral OF asyncregister IS
     SIGNAL output_reg : UNSIGNED(0 TO (N - 1));
-
 BEGIN
 
     async : PROCESS (ld, clr, data)
     BEGIN
         IF clr = '1' THEN
             output_reg(0 TO (N - 1)) <= (OTHERS => '0');
-        ELSIF (ld = '1') THEN
+        ELSIF ld = '1' THEN
             output_reg <= data;
         END IF;
     END PROCESS;
