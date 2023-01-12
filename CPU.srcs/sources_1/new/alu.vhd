@@ -3,7 +3,9 @@ USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.NUMERIC_STD.ALL;
 
 ENTITY alu IS
-    GENERIC (N : INTEGER := 9);
+    GENERIC (
+        N : INTEGER := 9
+    );
     PORT (
         data1 : IN unsigned(0 TO (N - 1));
         data2 : IN unsigned(0 TO (N - 1));
@@ -18,7 +20,6 @@ ARCHITECTURE Behavioral OF alu IS
 
 BEGIN
     microinstructions <= pac & tra2 & dec & sum;
-
     alu : PROCESS (microinstructions, data1, data2)
     BEGIN
         CASE(microinstructions) IS
@@ -32,6 +33,7 @@ BEGIN
 
     z <= '1' WHEN (presult = 0) ELSE
         '0';
+
     result <= presult;
 
 END Behavioral;
