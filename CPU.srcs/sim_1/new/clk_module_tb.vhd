@@ -39,6 +39,8 @@ BEGIN
 
     clk_module_sim : PROCESS
     BEGIN
+        WAIT FOR 15ns;
+        trace <= '1';
         WAIT FOR 170ns;
         pulse <= '1';
         WAIT FOR 80ns;
