@@ -9,7 +9,10 @@ END clk_module_tb;
 ARCHITECTURE Behavioral OF clk_module_tb IS
 
     COMPONENT clk_module IS
-        GENERIC (Division : INTEGER := 4); --new frec = old frec / 2^(Division - 1)
+        GENERIC (
+            Division : INTEGER := 4;
+            PulseBits : INTEGER := 4
+        ); --new frec = old frec / 2^(Division - 1)
         PORT (
             clk_in : IN STD_LOGIC;
             trace : IN STD_LOGIC; --Synchronous activation
