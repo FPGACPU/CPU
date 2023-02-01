@@ -10,8 +10,7 @@ ARCHITECTURE Behavioral OF clk_module_tb IS
 
     COMPONENT clk_module IS
         GENERIC (
-            Division : INTEGER := 4;
-            PulseBits : INTEGER := 4
+            Division : INTEGER := 4
         ); --new frec = old frec / 2^(Division - 1)
         PORT (
             clk_in : IN STD_LOGIC;
@@ -42,19 +41,22 @@ BEGIN
 
     clk_module_sim : PROCESS
     BEGIN
-        WAIT FOR 15ns;
-        trace <= '1';
-        WAIT FOR 170ns;
-        pulse <= '1';
+        WAIT FOR 185ns;
         WAIT FOR 80ns;
         pulse <= '0';
         trace <= '1';
-        WAIT FOR 70ns;
+        WAIT FOR 140ns;
         pulse <= '1';
         WAIT FOR 6ns;
         pulse <= '0';
         trace <= '0';
         WAIT FOR 80ns;
+        trace <= '1';
+        WAIT FOR 150ns;
+        pulse <= '1';
+        WAIT FOR 250ns;
+        trace <= '0';
+        WAIT FOR 100ns;
 
     END PROCESS;
 
