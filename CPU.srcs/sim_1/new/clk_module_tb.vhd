@@ -54,6 +54,14 @@ BEGIN
         trace <= '1';
         WAIT FOR 150ns;
         pulse <= '1';
+        WAIT FOR 3ns;
+        pulse <= '0';
+        WAIT FOR 2ns;
+        pulse <= '1';
+        WAIT FOR 4ns;
+        pulse <= '0';
+        WAIT FOR 6ns;
+        pulse <= '1';
         WAIT FOR 250ns;
         trace <= '0';
         WAIT FOR 100ns;
