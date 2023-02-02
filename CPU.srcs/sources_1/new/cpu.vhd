@@ -6,31 +6,35 @@ ENTITY cpu IS
     PORT (
         clk : IN STD_LOGIC;
         lec, esc : OUT STD_LOGIC;
-        data_bus : INOUT STD_LOGIC_VECTOR(0 TO 11);
+        data_bus : INOUT STD_LOGIC_VECTOR(0 TO 8);
         addr_bus : OUT STD_LOGIC_VECTOR(0 TO 11);
-        ac_output : OUT UNSIGNED(0 TO 11);
+        ac_debug : OUT UNSIGNED(0 TO 11);
         reset : IN STD_LOGIC
     );
 END cpu;
 
 ARCHITECTURE Behavioral OF cpu IS
     COMPONENT syncregister
-        GENERIC (N : INTEGER := 12);
+        GENERIC (
+            TYPE T;
+            CLR_VALUE : T);
         PORT (
             clk : IN STD_LOGIC;
             ld : IN STD_LOGIC;
             clr : IN STD_LOGIC;
-            data : IN STD_LOGIC_VECTOR(0 TO (N - 1));
-            output : OUT STD_LOGIC_VECTOR(0 TO (N - 1)));
+            data : IN T;
+            output : OUT T);
     END COMPONENT;
 
     COMPONENT asyncregister IS
-        GENERIC (N : INTEGER := 12);
+        GENERIC (
+            TYPE T;
+            CLR_VALUE : T);
         PORT (
             ld : IN STD_LOGIC;
             clr : IN STD_LOGIC;
-            data : IN STD_LOGIC_VECTOR(0 TO (N - 1));
-            output : OUT STD_LOGIC_VECTOR(0 TO (N - 1)));
+            data : IN T;
+            output : OUT T);
     END COMPONENT;
 
     COMPONENT incregister IS
@@ -44,7 +48,7 @@ ARCHITECTURE Behavioral OF cpu IS
             output : OUT UNSIGNED(0 TO (N - 1)));
     END COMPONENT;
 
-    COMPONENT sequencer_comp IS
+    COMPONENT sequencer IS
         PORT (
             Z : IN STD_LOGIC;
             clk : IN STD_LOGIC;
@@ -58,7 +62,7 @@ ARCHITECTURE Behavioral OF cpu IS
         );
     END COMPONENT;
 
-    COMPONENT alu_comp IS
+    COMPONENT alu IS
         GENERIC (
             N : INTEGER := 12
         );
@@ -70,29 +74,75 @@ ARCHITECTURE Behavioral OF cpu IS
             z : OUT STD_LOGIC);
     END COMPONENT;
 
+    COMPONENT tristate IS
+        GENERIC (
+            TYPE T;
+            default_value : T);
+        PORT (
+            enable : IN STD_LOGIC;
+            data : IN T;
+            output : OUT T);
+    END COMPONENT;
+
     SIGNAL pac, tra2, dec, sum, eac, sac, scp, ecp, incp, ccp, era, sri, eri : STD_LOGIC;
     SIGNAL z_input, z_output : STD_LOGIC;
     SIGNAL alu_output : UNSIGNED(0 TO 11);
+    SIGNAL ac_output : UNSIGNED(0 TO 11);
     SIGNAL ri_output : STD_LOGIC_VECTOR(0 TO 11);
     ALIAS co : STD_LOGIC_VECTOR(0 TO 2) IS ri_output(0 TO 2);
-    SIGNAL cp_output : UNSIGNED(0 TO 11);
+    ALIAS cd : STD_LOGIC_VECTOR(0 TO 8) IS ri_output(3 TO 11);
+    SIGNAL addr_internal_bus : STD_LOGIC_VECTOR(0 TO 8);
+    SIGNAL cp_output : UNSIGNED(0 TO 8);
 BEGIN
+    ac_debug <= ac_output;
 
-    alu : alu_comp PORT MAP(
+    alu_instance : alu PORT MAP(
         pac => pac,
         sum => sum,
         tra2 => tra2,
         dec => dec,
         data1 => ac_output,
         data2 => unsigned(data_bus),
+
         result => alu_output,
         z => z_input
     );
 
-    sequencer : sequencer_comp PORT MAP(
-        z => z_output,
+    ac : syncregister GENERIC MAP(
+        T => UNSIGNED(0 TO 11),
+        CLR_VALUE => (others => '0')
+        ) PORT MAP(
+        clk => NOT clk,
+        ld => eac,
+        output => ac_output,
+        data => alu_output,
+        clr => reset
+    );
+
+    ac_tristate : tristate GENERIC MAP(
+        T => STD_LOGIC_VECTOR(0 TO 11),
+        default_value => (others => 'Z')
+        ) PORT MAP(
+        data => std_logic_vector(ac_output),
+        output => data_bus,
+        enable => sac
+    );
+
+    z : asyncregister
+    GENERIC MAP(T => STD_LOGIC, CLR_VALUE => '0')
+    PORT MAP(
+        data => z_input,
+        ld => pac OR sum OR tra2 OR dec,
+        output => z_output,
+        clr => reset
+    );
+
+    sequencer_instance : sequencer PORT MAP(
         clk => clk,
+
         co => co,
+        z => z_output,
+
         lec => lec,
         esc => esc,
         pac => pac,
@@ -110,7 +160,10 @@ BEGIN
         eri => eri
     );
 
-    ri : syncregister PORT MAP(
+    ri : syncregister GENERIC MAP(
+        T => STD_LOGIC_VECTOR(0 TO 11),
+        CLR_VALUE => (others => '0')
+        ) PORT MAP(
         clk => NOT clk,
         data => data_bus,
         output => ri_output,
@@ -118,17 +171,10 @@ BEGIN
         clr => reset
     );
 
-    ac : syncregister PORT MAP(
-        clk => NOT clk,
-        ld => eac,
-        output => STD_LOGIC_VECTOR(ac_output),
-        data => STD_LOGIC_VECTOR(alu_output),
-        clr => reset
-    );
-
-    ra : syncregister
-    GENERIC MAP(N := 9)
-    PORT MAP(
+    ra : syncregister GENERIC MAP(
+        T => STD_LOGIC_VECTOR(0 TO 8),
+        CLR_VALUE => (others => '0')
+        ) PORT MAP(
         clk => clk,
         data => addr_internal_bus,
         output => addr_bus,
@@ -136,23 +182,32 @@ BEGIN
         clr => reset
     );
 
-    cp : incregister
-    GENERIC MAP(N := 9)
+    cd_tristate : tristate GENERIC MAP(
+        T => STD_LOGIC_VECTOR(0 TO 8),
+        default_value => (others => 'Z')
+        ) PORT MAP(
+        enable => sri,
+        data => cd,
+        output => addr_internal_bus
+    );
+
+    cp : incregister GENERIC MAP(N => 9)
     PORT MAP(
         clk => NOT clk,
         ld => ecp,
         inc => incp,
         clr => ccp,
         data => unsigned(addr_internal_bus),
-        output => cp_output,
+        output => cp_output
     );
 
-    z : asyncregister
-    GENERIC MAP(N := 1)
-    PORT MAP(
-        data => z_input,
-        ld => pac OR sum OR tra2 OR dec1,
-        output => z_output,
-        clr => reset
+    cp_tristate : tristate GENERIC MAP(
+        T => STD_LOGIC_VECTOR(0 TO 8),
+        default_value => (others => 'Z')
+        ) PORT MAP (
+        enable => scp,
+        data => STD_LOGIC_VECTOR(cp_output),
+        output => addr_internal_bus
     );
+
 END Behavioral;
