@@ -14,7 +14,8 @@ ENTITY sequencer IS
         eac, sac : OUT STD_LOGIC; --AC's u-orders
         scp, ecp, incp, ccp : OUT STD_LOGIC; --CP's u-orders
         era : OUT STD_LOGIC; --RA's u-orders
-        sri, eri : OUT STD_LOGIC --RI's u-orders
+        sri, eri : OUT STD_LOGIC; --RI's u-orders
+        reset : IN STD_LOGIC
     );
 END sequencer;
 
@@ -27,9 +28,11 @@ ARCHITECTURE Behavioral OF sequencer IS
 BEGIN
     --Simplez orders
     -- It is set as a ciclic process
-    StateProcess : PROCESS (clk) --Registro de estado  
+    StateProcess : PROCESS (clk, reset) --Registro de estado
     BEGIN
-        IF (falling_edge(clk)) THEN
+        IF reset = '1' THEN
+            state <= I0;
+            ELSIF (falling_edge(clk)) THEN
             state <= new_state;
         END IF;
     END PROCESS;

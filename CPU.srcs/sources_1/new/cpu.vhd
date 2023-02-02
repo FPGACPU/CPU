@@ -58,7 +58,8 @@ ARCHITECTURE Behavioral OF cpu IS
             eac, sac : OUT STD_LOGIC; --AC's u-orders
             scp, ecp, incp, ccp : OUT STD_LOGIC; --CP's u-orders
             era : OUT STD_LOGIC; --RA's u-orders
-            sri, eri : OUT STD_LOGIC --RI's u-orders
+            sri, eri : OUT STD_LOGIC; --RI's u-orders
+            reset : IN STD_LOGIC
         );
     END COMPONENT;
 
@@ -110,7 +111,7 @@ BEGIN
 
     ac : syncregister GENERIC MAP(
         T => UNSIGNED(0 TO 11),
-        CLR_VALUE => (others => '0')
+        CLR_VALUE => (OTHERS => '0')
         ) PORT MAP(
         clk => NOT clk,
         ld => eac,
@@ -121,9 +122,9 @@ BEGIN
 
     ac_tristate : tristate GENERIC MAP(
         T => STD_LOGIC_VECTOR(0 TO 11),
-        default_value => (others => 'Z')
+        default_value => (OTHERS => 'Z')
         ) PORT MAP(
-        data => std_logic_vector(ac_output),
+        data => STD_LOGIC_VECTOR(ac_output),
         output => data_bus,
         enable => sac
     );
@@ -142,6 +143,8 @@ BEGIN
 
         co => co,
         z => z_output,
+
+        reset => reset,
 
         lec => lec,
         esc => esc,
@@ -162,7 +165,7 @@ BEGIN
 
     ri : syncregister GENERIC MAP(
         T => STD_LOGIC_VECTOR(0 TO 11),
-        CLR_VALUE => (others => '0')
+        CLR_VALUE => (OTHERS => '0')
         ) PORT MAP(
         clk => NOT clk,
         data => data_bus,
@@ -173,7 +176,7 @@ BEGIN
 
     ra : syncregister GENERIC MAP(
         T => STD_LOGIC_VECTOR(0 TO 8),
-        CLR_VALUE => (others => '0')
+        CLR_VALUE => (OTHERS => '0')
         ) PORT MAP(
         clk => clk,
         data => addr_internal_bus,
@@ -184,7 +187,7 @@ BEGIN
 
     cd_tristate : tristate GENERIC MAP(
         T => STD_LOGIC_VECTOR(0 TO 8),
-        default_value => (others => 'Z')
+        default_value => (OTHERS => 'Z')
         ) PORT MAP(
         enable => sri,
         data => cd,
@@ -196,14 +199,14 @@ BEGIN
         clk => NOT clk,
         ld => ecp,
         inc => incp,
-        clr => ccp,
+        clr => ccp OR reset,
         data => unsigned(addr_internal_bus),
         output => cp_output
     );
 
     cp_tristate : tristate GENERIC MAP(
         T => STD_LOGIC_VECTOR(0 TO 8),
-        default_value => (others => 'Z')
+        default_value => (OTHERS => 'Z')
         ) PORT MAP (
         enable => scp,
         data => STD_LOGIC_VECTOR(cp_output),
