@@ -22,7 +22,7 @@ ARCHITECTURE Behavioral OF cpu_tb IS
     SIGNAL clk : STD_LOGIC := '0';
     SIGNAL lec : STD_LOGIC;
     SIGNAL esc : STD_LOGIC;
-    SIGNAL data_bus : STD_LOGIC_VECTOR(0 TO 11) := "000000000000";
+    SIGNAL data_bus : STD_LOGIC_VECTOR(0 TO 11) := (OTHERS => '0');
     SIGNAL addr_bus : STD_LOGIC_VECTOR(0 TO 8);
     SIGNAL ac_debug : UNSIGNED(0 TO 11);
     SIGNAL reset : STD_LOGIC := '0';
@@ -30,7 +30,7 @@ ARCHITECTURE Behavioral OF cpu_tb IS
 BEGIN
     DUT : cpu
     PORT MAP(
-        clk => NOT clk,
+        clk => clk,
         lec => lec,
         esc => esc,
         data_bus => data_bus,
@@ -49,18 +49,18 @@ BEGIN
     simcpu : PROCESS
     BEGIN
         reset <= '1';
-        WAIT FOR 40 ns;
+        data_bus <= "001000000100"; -- LD /4
+        WAIT FOR 35 ns;
         reset <= '0';
-        data_bus <= "010000000100";
-        WAIT FOR 40 ns;
-        data_bus <= "000000000010";
-        WAIT FOR 50 ns;
-        reset <= '1';
-        WAIT FOR 60 ns;
-        reset <= '0';
-        data_bus <= "111000000000";
-        WAIT FOR 70 ns;
-
+        WAIT FOR 5 ns;
+        data_bus <= "000000001001"; -- 9 (dec)
+        WAIT FOR 30 ns;
+        data_bus <= "010000000010"; -- ADD /2
+        WAIT FOR 10 ns;
+        data_bus <= "000000000110"; -- 6 (dec)
+        WAIT FOR 15 ns;
+        data_bus <= "111000000000"; -- HALT
+        WAIT FOR 100 ns;
         FINISH;
     END PROCESS;
 
