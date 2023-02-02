@@ -19,7 +19,7 @@ ARCHITECTURE Behavioral OF cpu_tb IS
     END COMPONENT;
 
     CONSTANT clk_period : TIME := 10 ns;
-    SIGNAL clk : STD_LOGIC := '1';
+    SIGNAL clk : STD_LOGIC := '0';
     SIGNAL lec : STD_LOGIC;
     SIGNAL esc : STD_LOGIC;
     SIGNAL data_bus : STD_LOGIC_VECTOR(0 TO 11) := "000000000000";
@@ -30,7 +30,7 @@ ARCHITECTURE Behavioral OF cpu_tb IS
 BEGIN
     DUT : cpu
     PORT MAP(
-        clk => clk,
+        clk => NOT clk,
         lec => lec,
         esc => esc,
         data_bus => data_bus,
@@ -48,12 +48,16 @@ BEGIN
 
     simcpu : PROCESS
     BEGIN
+        reset <= '1';
+        WAIT FOR 40 ns;
+        reset <= '0';
         data_bus <= "010000000100";
         WAIT FOR 40 ns;
         data_bus <= "000000000010";
         WAIT FOR 50 ns;
         reset <= '1';
         WAIT FOR 60 ns;
+        reset <= '0';
         data_bus <= "111000000000";
         WAIT FOR 70 ns;
 
