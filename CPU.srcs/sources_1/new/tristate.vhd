@@ -8,7 +8,7 @@ ENTITY tristate IS
         TYPE T;
         default_value : T);
     PORT (
-        ex : IN STD_LOGIC;
+        enable : IN STD_LOGIC;
         data : IN T;
         output : OUT T);
 END tristate;
@@ -16,6 +16,6 @@ END tristate;
 ARCHITECTURE Behavioral OF tristate IS
 
 BEGIN
-    output <= data WHEN ex = '1' ELSE
+    output <= data WHEN enable = '1' ELSE
         default_value;
 END Behavioral;
