@@ -4,12 +4,12 @@ USE IEEE.NUMERIC_STD.ALL;
 ENTITY asyncregister IS
     GENERIC (
         TYPE T;
-        CLR_VALUE: T);
+        CLR_VALUE : T);
     PORT (
-    ld : IN STD_LOGIC;
-    clr : IN STD_LOGIC;
-    data : IN T;
-    output : OUT T);
+        ld : IN STD_LOGIC;
+        clr : IN STD_LOGIC;
+        data : IN T;
+        output : OUT T);
 END asyncregister;
 
 ARCHITECTURE Behavioral OF asyncregister IS
