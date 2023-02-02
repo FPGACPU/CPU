@@ -6,8 +6,8 @@ ENTITY cpu IS
     PORT (
         clk : IN STD_LOGIC;
         lec, esc : OUT STD_LOGIC;
-        data_bus : INOUT STD_LOGIC_VECTOR(0 TO 8);
-        addr_bus : OUT STD_LOGIC_VECTOR(0 TO 11);
+        data_bus : INOUT STD_LOGIC_VECTOR(0 TO 11);
+        addr_bus : OUT STD_LOGIC_VECTOR(0 TO 8);
         ac_debug : OUT UNSIGNED(0 TO 11);
         reset : IN STD_LOGIC
     );

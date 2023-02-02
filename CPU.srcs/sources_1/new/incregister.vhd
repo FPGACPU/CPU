@@ -26,7 +26,7 @@ ARCHITECTURE Behavioral OF incregister IS
             output : OUT T);
     END COMPONENT;
 
-    SIGNAL reg_data : STD_LOGIC_VECTOR(0 TO (N - 1));
+    SIGNAL reg_data : UNSIGNED(0 TO (N - 1));
     SIGNAL reg_ld : STD_LOGIC;
 BEGIN
     internal_reg : syncregister
