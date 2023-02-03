@@ -20,7 +20,7 @@ BEGIN
     BEGIN
         IF clr = '1' THEN
             output_reg <= CLR_VALUE;
-            ELSIF ld = '1' THEN
+        ELSIF ld = '1' THEN
             output_reg <= data;
         END IF;
     END PROCESS;
