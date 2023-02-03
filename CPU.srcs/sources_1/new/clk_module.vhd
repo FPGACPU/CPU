@@ -19,7 +19,7 @@ BEGIN
 
     counter : PROCESS (clk_in, trace, pulse, count)
     BEGIN
-        IF (trace = '1') AND rising_edge(pulse) THEN
+        IF (trace = '1') AND pulse = '1' THEN
             count <= (OTHERS => '1');
         END IF;
 
