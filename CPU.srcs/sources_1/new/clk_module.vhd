@@ -19,9 +19,9 @@ BEGIN
 
     counter : PROCESS (clk_in, trace, pulse, count)
     BEGIN
-        IF (trace = '1') AND rising_edge(pulse) = '1' THEN
+        IF (trace = '1') AND rising_edge(pulse) THEN
             count <= (OTHERS => '1');
-        ELSIF falling_edge(clk_in) AND (trace = '0' OR NOT (count = 0)) THEN
+        ELSIF falling_edge(clk_in) AND (trace = '0' NOR (count = "0")) THEN
             count <= count - 1;
         END IF;
     END PROCESS;

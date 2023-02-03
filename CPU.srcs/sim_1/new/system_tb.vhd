@@ -44,7 +44,7 @@ BEGIN
         pulse <= '0';
         WAIT FOR clk_period * 32;
         pulse <= '1';
-        WAIT FOR clk_period * 32;
+        WAIT FOR clk_period * 32; --Run it for at least 14 us (with the program in memory, if you use other add more or less time)
     END PROCESS;
 
     reset_process : PROCESS
@@ -55,5 +55,6 @@ BEGIN
         WAIT FOR 640ns;
         reset <= '0';
         WAIT;
+        FINISH;
     END PROCESS;
 END Behavioral;
