@@ -21,9 +21,7 @@ BEGIN
     BEGIN
         IF (trace = '1') AND pulse = '1' THEN
             count <= (OTHERS => '1');
-        END IF;
-
-        IF falling_edge(clk_in) AND (trace = '0' OR NOT (count = 0)) THEN
+        ELSIF falling_edge(clk_in) AND (trace = '0' OR NOT (count = 0)) THEN
             count <= count - 1;
         END IF;
     END PROCESS;
