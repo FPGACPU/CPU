@@ -34,15 +34,6 @@ ARCHITECTURE Behavioral OF system IS
         );
     END COMPONENT;
 
-    COMPONENT memory_256 IS
-        PORT (
-            clk : IN STD_LOGIC;
-            lec, esc : IN STD_LOGIC;
-            addr : IN STD_LOGIC_VECTOR(0 TO 7);
-            data : INOUT STD_LOGIC_VECTOR(0 TO 11)
-        );
-    END COMPONENT;
-
     COMPONENT clk_module IS
         GENERIC (
             Division : INTEGER := 4); --Division 2^(N-1)
@@ -53,9 +44,29 @@ ARCHITECTURE Behavioral OF system IS
             clk_out : OUT STD_LOGIC);
     END COMPONENT;
 
+    COMPONENT memory IS
+        PORT (
+            clka : IN STD_LOGIC;
+            addra : IN STD_LOGIC_VECTOR(0 TO 8);
+            dina : IN STD_LOGIC_VECTOR(0 TO 11);
+            douta : OUT STD_LOGIC_VECTOR(0 TO 11);
+            wea : IN STD_LOGIC
+        );
+    END COMPONENT;
+    COMPONENT tristate IS
+        GENERIC (
+            TYPE T;
+            default_value : T);
+        PORT (
+            enable : IN STD_LOGIC;
+            data : IN T;
+            output : OUT T);
+    END COMPONENT;
+
     SIGNAL clk : STD_LOGIC;
     SIGNAL addr : STD_LOGIC_VECTOR(0 TO 8);
     SIGNAL addr_mem : STD_LOGIC_VECTOR(0 TO 7);
+    SIGNAL dout : STD_LOGIC_VECTOR(0 TO 11);
     SIGNAL data : STD_LOGIC_VECTOR(0 TO 11);
     SIGNAL lec, esc : STD_LOGIC;
     SIGNAL lec_mem, esc_mem : STD_LOGIC;
@@ -84,12 +95,22 @@ BEGIN
         esc1 => esc_io
     );
 
-    memory_256_inst : memory_256 PORT MAP(
-        clk => clk,
-        lec => lec_mem,
-        esc => esc_mem,
-        addr => addr_mem,
-        data => data
+    memory_inst : memory PORT MAP(
+        clka => clk,
+        addra => addr_mem & '0',
+        dina => data,
+        douta => dout,
+        wea => esc
+
+    );
+
+    tristate_inst : tristate GENERIC MAP(
+        T => STD_LOGIC_VECTOR(0 TO 11),
+        DEFAULT_VALUE => (OTHERS => 'Z')
+        ) PORT MAP(
+        data => dout,
+        enable => lec,
+        output => data
     );
 
     clk_module_inst : clk_module GENERIC MAP(
